@@ -94,20 +94,25 @@ def main(args):
             lab = asNum(answers[qu_num])
             question = questions[qu_num]
             opts = options[qu_num]
-            passage_encodings_dict = tokenizer(context, truncation=True, max_length=MAXLEN_passage, padding="max_length")
-            input_ids.append(passage_encodings_dict['input_ids'])
-            input_att_msks.append(passage_encodings_dict['attention_mask'])
             corr_opt = opts[lab]
-            combo = question + " [SEP] " + corr_opt
+            context_combo = context + " [SEP] " + question + " [SEP] " + corr_opt
+
             num_distractor = 0
             for opt_num, opt in enumerate(opts):
                 if opt_num == lab:
                     continue
                 num_distractor += 1
-                if num_distractor > 2:
+                if num_distractor == 2:
+                    combo_out = opt
                     break
-                combo = combo + " [SEP] " + opt
-            question_encodings_dict = tokenizer(combo, truncation=True, max_length=MAXLEN_question, padding="max_length")
+                else:
+                    context_combo = context_combo + " [SEP] " + opt
+
+            passage_encodings_dict = tokenizer(context_combo, truncation=True, truncation_side="left", max_length=MAXLEN_passage, padding="max_length")
+            input_ids.append(passage_encodings_dict['input_ids'])
+            input_att_msks.append(passage_encodings_dict['attention_mask'])
+            
+            question_encodings_dict = tokenizer(combo_out, truncation=True, max_length=MAXLEN_question, padding="max_length")
             output_ids.append([x if x!=0 else -100 for x in question_encodings_dict['input_ids']])
 
     input_ids = torch.tensor(input_ids)
