@@ -69,7 +69,7 @@ def main(args):
         college_data = json.load(f)
     train_data = middle_data + high_data + college_data
 
-    tokenizer = T5Tokenizer.from_pretrained("t5-base")
+    tokenizer = T5Tokenizer.from_pretrained("t5-base", truncation_side="left")
 
     def asNum(x):
         if x=="A":
@@ -96,7 +96,7 @@ def main(args):
             opts = options[qu_num]
             corr_opt = opts[lab]
             context_combo = context + " [SEP] " + question + " [SEP] " + corr_opt
-            passage_encodings_dict = tokenizer(context_combo, truncation=True, truncation_side="left", max_length=MAXLEN_passage, padding="max_length")
+            passage_encodings_dict = tokenizer(context_combo, truncation=True, max_length=MAXLEN_passage, padding="max_length")
             input_ids.append(passage_encodings_dict['input_ids'])
             input_att_msks.append(passage_encodings_dict['attention_mask'])
             

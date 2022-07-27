@@ -55,7 +55,7 @@ def main(args):
     # Choose device
     device = get_default_device()  
 
-    tokenizer = T5Tokenizer.from_pretrained("t5-base")
+    tokenizer = T5Tokenizer.from_pretrained("t5-base", truncation_side="left")
 
     count = 0
 
@@ -72,7 +72,7 @@ def main(args):
 
     for context, question_answer in zip(all_context, all_question_answer):
         combo = context + " [SEP] " + question_answer
-        passage_encodings_dict = tokenizer(combo, truncation=True, truncation_side="left", max_length=MAXLEN_passage, padding="max_length", return_tensors="pt")
+        passage_encodings_dict = tokenizer(combo, truncation=True, max_length=MAXLEN_passage, padding="max_length", return_tensors="pt")
         inp_id = passage_encodings_dict['input_ids']
         inp_att_msk = passage_encodings_dict['attention_mask']
         count+=1
